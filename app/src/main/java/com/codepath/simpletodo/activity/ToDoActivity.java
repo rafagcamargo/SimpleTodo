@@ -2,8 +2,10 @@ package com.codepath.simpletodo.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -12,60 +14,74 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.codepath.simpletodo.R;
+import com.codepath.simpletodo.adapter.TodoAdapter;
+import com.codepath.simpletodo.database.DatabaseHelper;
+import com.codepath.simpletodo.dialog.EditTodoDialog;
+import com.codepath.simpletodo.listener.EditTodoDialogListener;
+import com.codepath.simpletodo.model.Todo;
 
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 
-public class ToDoActivity extends AppCompatActivity {
+public class TodoActivity extends AppCompatActivity implements EditTodoDialogListener {
 
-    public static final String ITEM_ID = "itemId";
-    public static final String ITEM_TEXT = "itemText";
+    public static final String ITEM_POSITION = "itemPosition";
+    public static final String ITEM_TODO = "itemTodo";
 
     private static final int EDIT_ITEM_REQUEST = 0;
 
-    private List<String> items;
-    private ArrayAdapter<String> itemsAdapter;
+    private ArrayAdapter<Todo> todoAdapter;
     private ListView listViewItems;
     private EditText editTextNewItem;
+    private DatabaseHelper databaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_todo);
 
+        databaseHelper = DatabaseHelper.getInstance(this);
+
         listViewItems = (ListView) findViewById(R.id.listViewItems);
         editTextNewItem = (EditText) findViewById(R.id.editTextNewItem);
 
-        items = new ArrayList<>();
-        readItems();
-
-        itemsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
-        listViewItems.setAdapter(itemsAdapter);
+        List<Todo> todos = databaseHelper.getAllTodos();
+        todoAdapter = new TodoAdapter(this, todos);
+        listViewItems.setAdapter(todoAdapter);
 
         setupListViewListener();
         setupEditTextViewListener();
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == EDIT_ITEM_REQUEST) {
             if (resultCode == RESULT_OK) {
-                final int itemId = data.getIntExtra(ITEM_ID, -1);
-                final String itemText = data.getStringExtra(ITEM_TEXT);
-                items.set(itemId, itemText);
-                writeItems();
-                itemsAdapter.notifyDataSetChanged();
+                final int itemPosition = data.getIntExtra(ITEM_POSITION, -1);
+                final Todo itemTodo = (Todo) data.getSerializableExtra(ITEM_TODO);
+                databaseHelper.updateTodo(itemTodo);
+                todoAdapter.remove(itemTodo);
+                todoAdapter.insert(itemTodo, itemPosition);
+                todoAdapter.notifyDataSetChanged();
             }
         }
     }
 
     public void onAddItem(View view) {
         addItem();
+    }
+
+    @Override
+    public void onFinishEditTodoDialog(int itemPosition, Todo itemTodo) {
+        databaseHelper.updateTodo(itemTodo);
+        todoAdapter.remove(itemTodo);
+        todoAdapter.insert(itemTodo, itemPosition);
+        todoAdapter.notifyDataSetChanged();
     }
 
     private void addItem() {
@@ -76,17 +92,20 @@ public class ToDoActivity extends AppCompatActivity {
             return;
         }
 
-        itemsAdapter.add(itemText);
+        final Todo todo = new Todo(itemText);
+        databaseHelper.addTodo(todo);
+        todoAdapter.add(todo);
         editTextNewItem.setText("");
-        writeItems();
     }
 
     private void setupListViewListener() {
         listViewItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                items.remove(position);
-                itemsAdapter.notifyDataSetChanged();
+                Todo todo = todoAdapter.getItem(position);
+                databaseHelper.deleteTodo(todo);
+                todoAdapter.remove(todo);
+                todoAdapter.notifyDataSetChanged();
                 return true;
             }
         });
@@ -94,10 +113,8 @@ public class ToDoActivity extends AppCompatActivity {
         listViewItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(ToDoActivity.this, EditItemActivity.class);
-                intent.putExtra(ITEM_ID, position);
-                intent.putExtra(ITEM_TEXT, items.get(position));
-                startActivityForResult(intent, EDIT_ITEM_REQUEST);
+                Todo todo = todoAdapter.getItem(position);
+                showEditTodoActivity(position, todo);
             }
         });
     }
@@ -115,27 +132,16 @@ public class ToDoActivity extends AppCompatActivity {
         });
     }
 
-    private void readItems() {
-        File todoFile = getTodoFile();
-        try {
-            items = new ArrayList<>(FileUtils.readLines(todoFile));
-        } catch (IOException e) {
-            items = new ArrayList<>();
-        }
+    private void showEditTodoActivity(int  position, Todo todo) {
+        Intent intent = new Intent(TodoActivity.this, EditTodoActivity.class);
+        intent.putExtra(ITEM_POSITION, position);
+        intent.putExtra(ITEM_TODO, todo);
+        startActivityForResult(intent, EDIT_ITEM_REQUEST);
     }
 
-    private void writeItems() {
-        File todoFile = getTodoFile();
-        try {
-            FileUtils.writeLines(todoFile, items);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private File getTodoFile() {
-        File fileDirectory = getFilesDir();
-        File todoFile = new File(fileDirectory, "todo.txt");
-        return todoFile;
+    private void showEditTodoDialog(int  position, Todo todo) {
+        EditTodoDialog alertDialog = EditTodoDialog.newInstance(position, todo);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        alertDialog.show(fragmentManager, "edit_todo_dialog");
     }
 }
