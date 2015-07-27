@@ -5,4 +5,8 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="Button" parent="Base.Widget.AppCompat.Button.Borderless.Colored">
+
+    </style>
+
 </resources>

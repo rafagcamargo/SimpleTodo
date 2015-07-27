@@ -15,7 +15,6 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginBottom="15dp"
         android:text="@string/edit_item_below"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
@@ -26,10 +25,29 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/textViewEditItem"
-        android:layout_marginBottom="20dp"
         android:ems="10"
         android:inputType="text"
         android:singleLine="true" />
+
+    <TextView
+        android:id="@+id/textViewDueDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/editTextItem"
+        android:text="Due Date:"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <Button
+        android:id="@+id/buttonDueDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textViewDueDate"
+        android:onClick="onSaveItem"
+        android:text="Tue, Jul 14, 2015" />
 
     <Button
         android:id="@+id/buttonEditItem"
@@ -37,8 +55,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/editTextItem"
+        android:layout_below="@+id/buttonDueDate"
         android:onClick="onSaveItem"
         android:text="@string/save" />
+
 
 </RelativeLayout>

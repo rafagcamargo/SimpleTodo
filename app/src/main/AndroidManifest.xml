@@ -8,7 +8,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ToDoActivity"
+            android:name=".activity.TodoActivity"
             android:icon="@drawable/todo"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".EditItemActivity"
+            android:name=".activity.EditTodoActivity"
             android:label="@string/edit_item"
             android:screenOrientation="portrait" />
     </application>
