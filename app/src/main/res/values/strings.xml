@@ -3,15 +3,25 @@
 
     <string name="add_item">Add Item</string>
     <string name="enter_new_item">Enter a new item</string>
-    <string name="action_settings">Settings</string>
     <string name="edit_item">Edit Item</string>
     <string name="edit_item_due_date">Due Date</string>
     <string name="edit_item_priority">Priority</string>
+    <string name="sort_priority">Sort Priority</string>
+    <string name="ascending">Ascending</string>
+    <string name="descending">Descending</string>
     <string name="high">High</string>
     <string name="medium">Medium</string>
     <string name="low">Low</string>
     <string name="save">Save</string>
     <string name="you_cannot_save_empty_text">You cannot save an empty text.</string>
     <string name="none">None</string>
+    <string name="select">Select One</string>
+
+    <string name="settings">Settings</string>
+    <string name="preference_screen_type">Screen type</string>
+    <string name="preference_screen_type_value_activity">0</string>
+    <string name="preference_screen_type_value_dialog">1</string>
+    <string name="preference_screen_type_entry_activity">Activity</string>
+    <string name="preference_screen_type_entry_dialog">Dialog Fragment</string>
 
 </resources>

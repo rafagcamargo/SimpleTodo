@@ -7,25 +7,27 @@ import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.codepath.simpletodo.R;
 import com.codepath.simpletodo.activity.TodoActivity;
 import com.codepath.simpletodo.listener.EditTodoDialogListener;
 import com.codepath.simpletodo.model.Todo;
+import com.codepath.simpletodo.util.DateFormatUtils;
 
-import java.text.SimpleDateFormat;
+import java.io.Serializable;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 
-public class EditTodoDialog extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+public class EditTodoDialog extends DialogFragment implements DatePickerDialog.OnDateSetListener,
+        Serializable, AdapterView.OnItemSelectedListener {
 
     private Button buttonDueDate;
-    private Button buttonEditItem;
     private EditText editTextItem;
 
     private Integer itemPosition;
@@ -40,22 +42,6 @@ public class EditTodoDialog extends DialogFragment implements DatePickerDialog.O
         return editTodoDialog;
     }
 
-//    @Override
-//    public Dialog onCreateDialog(Bundle savedInstanceState) {
-//// the content
-//        final RelativeLayout root = new RelativeLayout(getActivity());
-//        root.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-//
-//        // creating the fullscreen dialog
-//        final Dialog dialog = new Dialog(getActivity());
-////        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//        dialog.setContentView(root);
-//        //dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.YELLOW));
-//        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-//
-//        return dialog;
-//    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -64,17 +50,31 @@ public class EditTodoDialog extends DialogFragment implements DatePickerDialog.O
         itemTodo = (Todo) args.getSerializable(TodoActivity.ITEM_TODO);
 
         View view = inflater.inflate(R.layout.fragment_edit_todo, container, false);
-        //getDialog().setTitle("Edit item");
+        getDialog().setTitle(R.string.edit_item);
 
         buttonDueDate = (Button) view.findViewById(R.id.buttonDueDate);
-        buttonDueDate.setText(getFormattedDate(new Date()));
         buttonDueDate.setOnClickListener(buttonDueDateOnClickListener());
 
-        buttonEditItem = (Button) view.findViewById(R.id.buttonEditItem);
+        Button buttonEditItem = (Button) view.findViewById(R.id.buttonEditItem);
         buttonEditItem.setOnClickListener(buttonEditItemOnClickListener());
 
         editTextItem = (EditText) view.findViewById(R.id.editTextItem);
         editTextItem.append(itemTodo.getNote());
+
+        if (itemTodo.hasDueDate()) {
+            buttonDueDate.setText(DateFormatUtils.getFormattedDate(itemTodo.getDueDate()));
+        }
+
+        Spinner spinner = (Spinner) view.findViewById(R.id.spinnerPriority);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
+                R.array.todo_priorities, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(this);
+
+        if (itemTodo.hasPriority()) {
+            spinner.setSelection(itemTodo.getPriorityOrder());
+        }
 
         return view;
     }
@@ -86,13 +86,8 @@ public class EditTodoDialog extends DialogFragment implements DatePickerDialog.O
         c.set(Calendar.MONTH, monthOfYear);
         c.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-        buttonDueDate.setText(getFormattedDate(c.getTime()));
-    }
-
-    public String getFormattedDate(Date date) {
-        String format = "EEE, LLL dd, yyyy";
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format, Locale.US);
-        return simpleDateFormat.format(date);
+        itemTodo.setDueDate(c.getTimeInMillis());
+        buttonDueDate.setText(DateFormatUtils.getFormattedDate(c.getTime()));
     }
 
     private View.OnClickListener buttonDueDateOnClickListener() {
@@ -101,7 +96,7 @@ public class EditTodoDialog extends DialogFragment implements DatePickerDialog.O
             public void onClick(View v) {
                 DialogFragment newFragment = new DatePickerFragment();
                 Bundle bundle = new Bundle();
-                //bundle.putSerializable("listener", EditTodoDialog.this);
+                bundle.putSerializable("listener", EditTodoDialog.this);
                 newFragment.setArguments(bundle);
                 newFragment.show(getFragmentManager(), "datePicker");
             }
@@ -126,5 +121,17 @@ public class EditTodoDialog extends DialogFragment implements DatePickerDialog.O
                 dismiss();
             }
         };
+    }
+
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        String priorityName = (String) parent.getAdapter().getItem(position);
+        itemTodo.setPriority(priorityName);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        //no-op
     }
 }

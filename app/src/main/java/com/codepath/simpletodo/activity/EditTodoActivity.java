@@ -25,7 +25,6 @@ public class EditTodoActivity extends AppCompatActivity implements DatePickerDia
 
     private EditText editTextItem;
     private Button buttonDueDate;
-    private RadioGroup radioGroupPriority;
 
     private Integer itemPosition;
     private Todo itemTodo;
@@ -44,13 +43,12 @@ public class EditTodoActivity extends AppCompatActivity implements DatePickerDia
 
         buttonDueDate = (Button) findViewById(R.id.buttonDueDate);
 
-        radioGroupPriority = (RadioGroup) findViewById(R.id.radioGroupPriority);
-
         if (itemTodo.hasDueDate()) {
             buttonDueDate.setText(DateFormatUtils.getFormattedDate(itemTodo.getDueDate()));
         }
 
         if (itemTodo.hasPriority()) {
+            RadioGroup radioGroupPriority = (RadioGroup) findViewById(R.id.radioGroupPriority);
             radioGroupPriority.check(itemTodo.getPriority().getId());
         }
     }

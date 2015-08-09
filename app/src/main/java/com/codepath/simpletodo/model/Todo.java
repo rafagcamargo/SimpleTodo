@@ -57,6 +57,14 @@ public class Todo implements Serializable {
         this.priority = Priority.getFromOrder(priorityOrder);
     }
 
+    public void setPriority(String priorityName) {
+        try {
+            this.priority = Priority.valueOf(priorityName.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            this.priority = null;
+        }
+    }
+
     public boolean hasPriority() {
         return this.priority != null;
     }

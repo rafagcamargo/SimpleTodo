@@ -6,13 +6,13 @@ import com.codepath.simpletodo.R;
 
 public enum Priority {
     HIGH(1, R.string.high, R.color.red, R.id.radioButtonHigh),
-    MEDIUM(3, R.string.medium, R.color.yellow, R.id.radioButtonMedium),
-    LOW(5, R.string.low, R.color.green, R.id.radioButtonLow);
+    MEDIUM(2, R.string.medium, R.color.yellow, R.id.radioButtonMedium),
+    LOW(3, R.string.low, R.color.green, R.id.radioButtonLow);
 
-    private int order;
-    private int label;
-    private int color;
-    private int id;
+    private final int order;
+    private final int label;
+    private final int color;
+    private final int id;
 
     Priority(int order, int label, int color, int id) {
         this.order = order;
@@ -42,9 +42,9 @@ public enum Priority {
         switch (order) {
             case 1:
                 return HIGH;
-            case 3:
+            case 2:
                 return MEDIUM;
-            case 5:
+            case 3:
                 return LOW;
         }
 

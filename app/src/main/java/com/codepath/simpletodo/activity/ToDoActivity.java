@@ -1,11 +1,14 @@
 package com.codepath.simpletodo.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -19,6 +22,7 @@ import com.codepath.simpletodo.database.DatabaseHelper;
 import com.codepath.simpletodo.dialog.EditTodoDialog;
 import com.codepath.simpletodo.listener.EditTodoDialogListener;
 import com.codepath.simpletodo.model.Todo;
+import com.codepath.simpletodo.sort.SortByPriority;
 
 import java.util.List;
 
@@ -34,6 +38,11 @@ public class TodoActivity extends AppCompatActivity implements EditTodoDialogLis
     private ListView listViewItems;
     private EditText editTextNewItem;
     private DatabaseHelper databaseHelper;
+    private Integer screenType;
+    private SortByPriority sortByPriority;
+
+    private MenuItem menuItemAscending;
+    private MenuItem menuItemDescending;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +55,10 @@ public class TodoActivity extends AppCompatActivity implements EditTodoDialogLis
         editTextNewItem = (EditText) findViewById(R.id.editTextNewItem);
 
         List<Todo> todos = databaseHelper.getAllTodos();
+
         todoAdapter = new TodoAdapter(this, todos);
+        sortByPriority = new SortByPriority();
+        todoAdapter.sort(sortByPriority);
         listViewItems.setAdapter(todoAdapter);
 
         setupListViewListener();
@@ -54,8 +66,35 @@ public class TodoActivity extends AppCompatActivity implements EditTodoDialogLis
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences sharedPref = getSharedPreferences(SettingsActivity.PREFERENCE_NAME, MODE_PRIVATE);
+        screenType = Integer.valueOf(sharedPref.getString(SettingsActivity.PREFERENCE_SCREEN_TYPE, "0"));
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        return super.onCreateOptionsMenu(menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.settings_menu, menu);
+        menuItemAscending = menu.findItem(R.id.sorting_priority_ascending);
+        menuItemDescending = menu.findItem(R.id.sorting_priority_descending);
+        return true;
+    }
+
+    public void onClickSettings(MenuItem menu) {
+        Intent intent = new Intent(TodoActivity.this, SettingsActivity.class);
+        startActivity(intent);
+    }
+
+    public void onClickSorting(MenuItem menu) {
+        boolean ascending = menu.getItemId() == R.id.sorting_priority_ascending;
+        int order = ascending ? SortByPriority.ASCENDING : SortByPriority.DESCENDING;
+
+        sortByPriority.setOrder(order);
+        todoAdapter.sort(sortByPriority);
+
+        menuItemAscending.setEnabled(!ascending);
+        menuItemDescending.setEnabled(ascending);
     }
 
     @Override
@@ -114,7 +153,11 @@ public class TodoActivity extends AppCompatActivity implements EditTodoDialogLis
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Todo todo = todoAdapter.getItem(position);
-                showEditTodoActivity(position, todo);
+                if (screenType == 0) {
+                    showEditTodoActivity(position, todo);
+                } else {
+                    showEditTodoDialog(position, todo);
+                }
             }
         });
     }
@@ -132,16 +175,17 @@ public class TodoActivity extends AppCompatActivity implements EditTodoDialogLis
         });
     }
 
-    private void showEditTodoActivity(int  position, Todo todo) {
+    private void showEditTodoActivity(int position, Todo todo) {
         Intent intent = new Intent(TodoActivity.this, EditTodoActivity.class);
         intent.putExtra(ITEM_POSITION, position);
         intent.putExtra(ITEM_TODO, todo);
         startActivityForResult(intent, EDIT_ITEM_REQUEST);
     }
 
-    private void showEditTodoDialog(int  position, Todo todo) {
+    private void showEditTodoDialog(int position, Todo todo) {
         EditTodoDialog alertDialog = EditTodoDialog.newInstance(position, todo);
         FragmentManager fragmentManager = getSupportFragmentManager();
         alertDialog.show(fragmentManager, "edit_todo_dialog");
     }
+
 }

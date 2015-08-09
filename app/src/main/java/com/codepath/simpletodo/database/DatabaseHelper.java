@@ -42,19 +42,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        final StringBuilder createTodoTable = new StringBuilder("CREATE TABLE ");
-        createTodoTable.append(Table.TODO);
-        createTodoTable.append("(");
-        createTodoTable.append(Column.ID);
-        createTodoTable.append(" INTEGER PRIMARY KEY AUTOINCREMENT,");
-        createTodoTable.append(Column.NOTE);
-        createTodoTable.append(" TEXT,");
-        createTodoTable.append(Column.PRIORITY_ORDER);
-        createTodoTable.append(" INTEGER,");
-        createTodoTable.append(Column.DUE_DATE);
-        createTodoTable.append(" LONG)");
-
-        db.execSQL(createTodoTable.toString());
+        db.execSQL("CREATE TABLE " + Table.TODO + "(" + Column.ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + Column.NOTE + " TEXT," + Column.PRIORITY_ORDER + " INTEGER," + Column.DUE_DATE + " LONG)");
     }
 
     @Override
@@ -78,24 +66,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         todo.setId((int) id);
 
         database.close();
-    }
-
-    public Todo getTodo(int id) {
-        SQLiteDatabase database = this.getReadableDatabase();
-
-        Cursor cursor = database.query(Table.TODO, new String[]{Column.ID, Column.NOTE}, Column.ID + "= ?", new String[]{String.valueOf(id)}, null, null, "id ASC", null);
-
-        if (cursor != null) {
-            cursor.moveToFirst();
-        }
-
-        Todo todo = null;//new Todo(cursor.getColumnIndexOrThrow(Column.ID), cursor.getString(1));
-
-        if (cursor != null) {
-            cursor.close();
-        }
-
-        return todo;
     }
 
     public List<Todo> getAllTodos() {
@@ -124,15 +94,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return todos;
     }
 
-    public int getTodoCount() {
-        final String countQuery = "SELECT * FROM " + Table.TODO;
-        SQLiteDatabase database = this.getReadableDatabase();
-        Cursor cursor = database.rawQuery(countQuery, null);
-        cursor.close();
-        return cursor.getCount();
-    }
-
-    public int updateTodo(Todo todo) {
+    public void updateTodo(Todo todo) {
         SQLiteDatabase database = this.getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
@@ -140,12 +102,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(Column.DUE_DATE, todo.getDueDate());
         contentValues.put(Column.PRIORITY_ORDER, todo.getPriorityOrder());
 
-        int result = database.update(Table.TODO, contentValues, Column.ID + " = ?",
+        database.update(Table.TODO, contentValues, Column.ID + " = ?",
                 new String[]{String.valueOf(todo.getId())});
 
         database.close();
-
-        return result;
     }
 
     public void deleteTodo(Todo todo) {
