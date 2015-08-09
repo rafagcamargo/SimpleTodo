@@ -1,27 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.codepath.simpletodo">
+<manifest xmlns:tools="http://schemas.android.com/tools"
+          package="com.codepath.simpletodo"
+          xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme">
+        android:supportsRtl="false"
+        android:theme="@style/AppTheme"
+        tools:ignore="UnusedAttribute">
         <activity
-            android:name=".ToDoActivity"
+            android:name=".activity.TodoActivity"
             android:icon="@drawable/todo"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity
-            android:name=".EditItemActivity"
+            android:name=".activity.EditTodoActivity"
             android:label="@string/edit_item"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.SettingsActivity"
+            android:label="@string/settings"
+            android:parentActivityName=".activity.TodoActivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:compat="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/sorting"
+        android:icon="@drawable/ic_reorder_white_24dp"
+        android:title="@string/sort_priority"
+        compat:showAsAction="ifRoom">
+        <menu>
+            <item
+                android:id="@+id/sorting_priority_ascending"
+                android:enabled="false"
+                android:onClick="onClickSorting"
+                android:title="@string/ascending"/>
+            <item
+                android:id="@+id/sorting_priority_descending"
+                android:enabled="true"
+                android:onClick="onClickSorting"
+                android:title="@string/descending"/>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/settings"
+        android:onClick="onClickSettings"
+        android:title="@string/settings"
+        compat:showAsAction="never"/>
+</menu>

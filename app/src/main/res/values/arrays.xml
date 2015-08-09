@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="preference_screen_type_entries">
+        <item>@string/preference_screen_type_entry_activity</item>
+        <item>@string/preference_screen_type_entry_dialog</item>
+    </string-array>
+    <integer-array name="preference_screen_type_values">
+        <item>@string/preference_screen_type_value_activity</item>
+        <item>@string/preference_screen_type_value_dialog</item>
+    </integer-array>
+    <string-array name="todo_priorities">
+        <item>@string/select</item>
+        <item>@string/high</item>
+        <item>@string/medium</item>
+        <item>@string/low</item>
+    </string-array>
+</resources>
