@@ -32,7 +32,7 @@ The following **additional** features are implemented:
 
 ## Video Walkthrough 
 
-<img src='https://drive.google.com/open?id=0B48QFDs5FcHMZUpBM0ZIenFIa0U' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='https://github.com/rafagcamargo/SimpleTodo/blob/master/SimpleTodo.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
